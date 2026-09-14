@@ -28,3 +28,12 @@ A callsign duplicated across workspaces is never guessed. The agent lists the ca
 - Callsigns are unique across the server.
 - Once the word list is exhausted, callsigns pair two words (`neon-mars`). That is 30 single names plus hundreds of pairs; beyond that a pane is left without one.
 - Callsigns and agent names are independent. A pane with the callsign `pika` can host an agent named `reviewer`.
+
+## Custom word list
+
+```sh
+export HERDR_CALLSIGNS_WORDS_FILE="$HOME/.config/herdr/callsigns-words.txt"  # one single-word token per line, no spaces
+# then (re)start the herdr server so the hook picks it up
+```
+
+Applies to the whole server, not per person. Switching later is safe: existing callsigns are kept.

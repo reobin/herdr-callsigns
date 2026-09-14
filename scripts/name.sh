@@ -9,7 +9,20 @@ set -eu
 cd "${HERDR_PLUGIN_ROOT:-.}"
 
 herdr_bin="${HERDR_BIN_PATH:-herdr}"
-words_file="assets/words.txt"
+default_words_file="assets/words.txt"
+words_file="${HERDR_CALLSIGNS_WORDS_FILE:-$default_words_file}"
+
+if [ ! -f "$words_file" ] || [ ! -r "$words_file" ] || [ ! -s "$words_file" ]; then
+  if [ "$words_file" != "$default_words_file" ]; then
+    echo "callsigns: words file not readable ($words_file), falling back to $default_words_file" >&2
+    words_file="$default_words_file"
+  fi
+fi
+
+if [ ! -f "$words_file" ] || [ ! -r "$words_file" ] || [ ! -s "$words_file" ]; then
+  echo "callsigns: words file not readable ($words_file), skipping naming" >&2
+  exit 0
+fi
 
 command -v jq >/dev/null 2>&1 || {
   echo "callsigns: jq not found, skipping naming" >&2
