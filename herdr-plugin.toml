@@ -2,7 +2,7 @@ id = "herdr-callsigns"
 name = "Callsigns"
 version = "0.1.0"
 min_herdr_version = "0.9.0"
-description = "Give every new pane a short callsign, and teach agents to resolve callsigns to pane IDs"
+description = "Auto-name every herdr pane with a short memorable callsign. Teach agents to resolve pane names and labels to pane IDs"
 platforms = ["linux", "macos"]
 
 [[startup]]

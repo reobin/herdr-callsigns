@@ -1,6 +1,6 @@
 # herdr-callsigns
 
-Gives every herdr pane a short, memorable callsign (`neon`, `mars`, `lima`), so you and your agent can refer to panes by name instead of ID.
+Auto-names every herdr pane with a short, memorable callsign (`neon`, `mars`, `lima`), so you and your agent can refer to panes by name or label instead of ID.
 
 ![Demo: asked what is failing in the mars pane and to tell lima to fix it, the agent loads the herdr-callsigns skill, resolves both callsigns to pane IDs, reads the failing test from mars, then prompts the lima agent with the fix](assets/demo.gif)
 
