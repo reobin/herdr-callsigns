@@ -51,4 +51,4 @@ They are independent namespaces. A pane with the callsign `pika` can host an age
 
 ## Assignment
 
-The plugin gives each new pane a callsign, and every pane still without one at startup. Existing callsigns are never overwritten, and they are unique across the server. Once the word list is exhausted it pairs two words, so a callsign may be compound (`bison-wapiti`). Beyond the pairs it can find, a pane is left without one rather than stalling the hook. To set one by hand: `herdr pane rename <id> <callsign>`.
+The plugin gives each new pane a callsign, and every pane still without one at startup. Existing callsigns are never overwritten, and they are unique across the server. Once the word list is exhausted it pairs two words, so a callsign may be compound (`bison-wapiti`). Beyond the pairs it can find, a pane is left without one rather than stalling the hook. The server may set `HERDR_CALLSIGNS_WORDS_FILE` to use a custom word list instead of the bundled one. To set one by hand: `herdr pane rename <id> <callsign>`.
