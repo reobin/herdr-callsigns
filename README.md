@@ -26,5 +26,5 @@ A callsign duplicated across workspaces is never guessed. The agent lists the ca
 
 - Existing callsigns are never overwritten.
 - Callsigns are unique across the server.
-- Once the word list is exhausted, callsigns pair two words (`neon-mars`). That is 75 single names plus thousands of pairs; beyond that a pane is left without one.
+- Once the word list is exhausted, callsigns pair two words (`neon-mars`). That is 30 single names plus hundreds of pairs; beyond that a pane is left without one.
 - Callsigns and agent names are independent. A pane with the callsign `pika` can host an agent named `reviewer`.
