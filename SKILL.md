@@ -1,11 +1,11 @@
 ---
 name: herdr-callsigns
-description: Herdr pane callsigns (neon, mars, io): short names on pane borders, stored as the pane `label`. Use when someone refers to or messages a named pane - "check mars output", "tell lima to rerun it", "hi thor, this is io" - to resolve the callsign to a pane ID for `herdr` commands, and to refer to panes by callsign in prose. Also covers auto-assigning callsigns.
+description: Use when someone says "pane <something>" - "check pane dawn", "tell lima to rerun it", "hi thor, this is io" - to resolve the callsign to a pane ID for herdr commands. Also covers referring to panes by callsign in prose and auto-assigning callsigns.
 ---
 
 # herdr-callsigns
 
-Herdr panes carry a short callsign (`neon`, `mars`, `lima`) shown on the pane border. Users refer to panes by that callsign; the `herdr` CLI only accepts pane IDs (`wFB:p1`). Resolve the callsign to an ID first. In the API and the CLI the callsign is the pane's `label` field.
+Herdr panes carry a short callsign (`neon`, `mars`, `lima`) shown on the pane border. Users refer to panes by that callsign; the `herdr` CLI only accepts pane IDs (`wFB:p1`). Resolve the callsign to an ID first. In the API and the CLI the callsign is the pane's `label` field. "pane <word>" means <word> is the callsign candidate.
 
 Never claim a pane does not exist until you have checked the label column. The `herdr` skill documents pane IDs and agent names only, so an agent following it alone will not expect `pluto` to resolve.
 
