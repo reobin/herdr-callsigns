@@ -1,6 +1,6 @@
 ---
 name: herdr-callsigns
-description: Resolve a Herdr pane callsign (a short name like neon, mars, pluto shown on the pane border) to the pane ID that herdr commands require. Use whenever someone names a pane, terminal, or agent instead of giving an ID - "read the carbon pane", "what did bison say", "tell lima to rerun it" - before running any herdr pane or agent command. Also covers the plugin that assigns those callsigns.
+description: Herdr pane callsigns (neon, mars, io): short names on pane borders, stored as the pane `label`. Use when someone refers to or messages a named pane - "check mars output", "tell lima to rerun it", "hi thor, this is io" - to resolve the callsign to a pane ID for `herdr` commands, and to refer to panes by callsign in prose. Also covers auto-assigning callsigns.
 ---
 
 # herdr-callsigns
@@ -44,6 +44,12 @@ herdr agent prompt <id> "..."
 ```
 
 A pane ID is a valid agent target when that pane hosts an agent.
+
+## When writing about panes
+
+Refer to panes by callsign in prose and in messages to other panes or the user. Give the pane ID in parentheses on first mention only when precision matters, e.g. `thor (wV0:p4)`. Resolve to the bare ID only inside `herdr` commands.
+
+When messaging another pane, open with `Hi <target-callsign>, this is <own-callsign> (<own-pane-id>)` plus one clause on your role, e.g. `Hi thor, this is io (wV0:p1), the svc-tags agent that wrote this diff.` The callsign is for the human, the pane ID in parentheses is CLI-resolvable and survives renames and duplicates. Find your own pair with the list command above, matching your pane ID or cwd.
 
 ## Callsigns are not agent names
 
