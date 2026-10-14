@@ -85,18 +85,124 @@ pick_name() {
   return 1
 }
 
+_lock_file="/tmp/herdr-callsigns.lock"
+_lock_dir="/tmp/herdr-callsigns.lock.dir"
+_lock_fd_open=0
+_lock_mkdir=0
+
+acquire_lock() {
+  tries=0
+  if command -v flock >/dev/null 2>&1; then
+    if [ "$_lock_fd_open" -ne 1 ]; then
+      eval 'exec 9>"$_lock_file"' 2>/dev/null && _lock_fd_open=1
+    fi
+    if [ "$_lock_fd_open" -eq 1 ]; then
+      while [ "$tries" -lt 50 ]; do
+        if flock -n 9 2>/dev/null; then
+          return 0
+        fi
+        tries=$((tries + 1))
+        sleep 0.1 2>/dev/null || sleep 1
+      done
+      return 1
+    fi
+  fi
+  tries=0
+  while [ "$tries" -lt 50 ]; do
+    if mkdir "$_lock_dir" 2>/dev/null; then
+      _lock_mkdir=1
+      return 0
+    fi
+    tries=$((tries + 1))
+    sleep 0.1 2>/dev/null || sleep 1
+  done
+  return 1
+}
+
+release_lock() {
+  if [ "${_lock_fd_open:-0}" -eq 1 ]; then
+    eval 'exec 9>&-' 2>/dev/null || true
+    _lock_fd_open=0
+  fi
+  if [ "${_lock_mkdir:-0}" -eq 1 ]; then
+    rmdir "$_lock_dir" 2>/dev/null || true
+    _lock_mkdir=0
+  fi
+}
+
+label_count() {
+  "$herdr_bin" pane list 2>/dev/null |
+    jq -r --arg l "$1" '[.result.panes[]? | select((.label // empty) == $l)] | length' 2>/dev/null
+}
+
+trap 'release_lock' INT TERM EXIT
+
 name_pane() {
   target="$1"
   attempts=0
-  while [ "$attempts" -lt 3 ]; do
-    if [ -n "$(pane_label "$target")" ]; then
-      return 0
+  assigned=""
+  tried=" "
+  while [ "$attempts" -lt 5 ]; do
+    current="$(pane_label "$target")" || current=""
+    if [ -n "$current" ] && [ "$current" != "$assigned" ]; then
+      case "$tried" in
+      *" $current "*) ;;
+      *)
+        count="$(label_count "$current")" || count=""
+        case "$count" in '' | *[!0-9]*) return 0 ;; esac
+        if [ "$count" -le 1 ]; then
+          return 0
+        fi
+        tried="$tried$current "
+        ;;
+      esac
     fi
-    candidate="$(pick_name "$(used_names)")" || return 1
-    [ -n "$candidate" ] || return 1
+    if [ -n "$assigned" ] && [ "$current" = "$assigned" ]; then
+      count="$(label_count "$assigned")" || count=""
+      case "$count" in '' | *[!0-9]*) return 0 ;; esac
+      if [ "$count" -le 1 ]; then
+        return 0
+      fi
+      tried="$tried$assigned "
+      assigned=""
+    fi
+    locked=0
+    if acquire_lock; then
+      locked=1
+    fi
+    fresh="$(pane_label "$target")" || fresh=""
+    case "$tried" in
+    *" $fresh "*) ;;
+    *)
+      if [ -n "$fresh" ] && [ "$fresh" != "$assigned" ]; then
+        count="$(label_count "$fresh")" || count=""
+        case "$count" in '' | *[!0-9]*)
+          [ "$locked" -eq 1 ] && release_lock
+          return 0
+          ;;
+        esac
+        if [ "$count" -le 1 ]; then
+          [ "$locked" -eq 1 ] && release_lock
+          return 0
+        fi
+        tried="$tried$fresh "
+      fi
+      ;;
+    esac
+    candidate="$(pick_name "$(used_names)$tried")" || {
+      [ "$locked" -eq 1 ] && release_lock
+      return 1
+    }
+    [ -n "$candidate" ] || {
+      [ "$locked" -eq 1 ] && release_lock
+      return 1
+    }
     if "$herdr_bin" pane rename "$target" "$candidate" >/dev/null 2>&1; then
-      return 0
+      assigned="$candidate"
+    else
+      tried="$tried$candidate "
     fi
+    [ "$locked" -eq 1 ] && release_lock
     attempts=$((attempts + 1))
   done
   echo "callsigns: failed to name pane $target after $attempts attempts" >&2
