@@ -1,6 +1,6 @@
 ---
 name: herdr-callsigns
-description: Use when someone says "pane <something>" - "check pane dawn", "tell lima to rerun it", "hi thor, this is io" - to resolve the callsign to a pane ID for herdr commands. Also covers referring to panes by callsign in prose and auto-assigning callsigns.
+description: Use when someone says "pane <word>" - "check pane dawn", "tell lima to rerun it", "hi thor, this is io" - to resolve the callsign to a pane ID for herdr commands, and whenever you name a pane to the user or another agent, such as where you started a worker. Also covers auto-assigning callsigns.
 ---
 
 # herdr-callsigns
@@ -47,7 +47,7 @@ A pane ID is a valid agent target when that pane hosts an agent.
 
 ## When writing about panes
 
-Refer to panes by callsign in prose and in messages to other panes or the user. Give the pane ID in parentheses on first mention only when precision matters, e.g. `thor (wV0:p4)`. Resolve to the bare ID only inside `herdr` commands.
+Name every pane you mention, to the user or to another agent, by its callsign with the pane ID in parentheses, as in `thor (wV0:p4)`. A pane with no callsign goes by its pane ID. An agent name goes beside the callsign, never in its place: `started con-4085-gaia-web in gold (w13E:p2)`. Resolve to the bare ID only inside `herdr` commands.
 
 When messaging another pane, open with `Hi <target-callsign>, this is <own-callsign> (<own-pane-id>)` plus one clause on your role, e.g. `Hi thor, this is io (wV0:p1), the svc-tags agent that wrote this diff.` The callsign is for the human, the pane ID in parentheses is CLI-resolvable and survives renames and duplicates. Find your own pair with the list command above, matching your pane ID or cwd.
 
