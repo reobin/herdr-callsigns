@@ -1,6 +1,6 @@
 ---
 name: herdr-callsigns
-description: Use when someone says "pane <word>" - "check pane dawn", "tell lima to rerun it", "hi thor, this is io" - to resolve the callsign to a pane ID for herdr commands, and whenever you name a pane to the user or another agent, such as where you started a worker. Also covers auto-assigning callsigns.
+description: Use when someone mentions a pane by a word - "check pane dawn", "look at pane tyr", "panes teal and seal", "tell lima to rerun it", "hi thor, this is io" - to resolve the callsign to a pane ID for herdr commands, and whenever you name a pane to the user or another agent, such as where you started a worker. Also covers auto-assigning callsigns.
 ---
 
 # herdr-callsigns
