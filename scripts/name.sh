@@ -11,17 +11,20 @@ cd "${HERDR_PLUGIN_ROOT:-.}"
 herdr_bin="${HERDR_BIN_PATH:-herdr}"
 default_words_file="assets/words.txt"
 words_file="${HERDR_CALLSIGNS_WORDS_FILE:-$default_words_file}"
+scheme="$(printf '%s' "${HERDR_CALLSIGNS_SCHEME:-words}" | tr '[:upper:]' '[:lower:]')"
 
-if [ ! -f "$words_file" ] || [ ! -r "$words_file" ] || [ ! -s "$words_file" ]; then
-  if [ "$words_file" != "$default_words_file" ]; then
-    echo "callsigns: words file not readable ($words_file), falling back to $default_words_file" >&2
-    words_file="$default_words_file"
+if [ "$scheme" != "serial" ]; then
+  if [ ! -f "$words_file" ] || [ ! -r "$words_file" ] || [ ! -s "$words_file" ]; then
+    if [ "$words_file" != "$default_words_file" ]; then
+      echo "callsigns: words file not readable ($words_file), falling back to $default_words_file" >&2
+      words_file="$default_words_file"
+    fi
   fi
-fi
 
-if [ ! -f "$words_file" ] || [ ! -r "$words_file" ] || [ ! -s "$words_file" ]; then
-  echo "callsigns: words file not readable ($words_file), skipping naming" >&2
-  exit 0
+  if [ ! -f "$words_file" ] || [ ! -r "$words_file" ] || [ ! -s "$words_file" ]; then
+    echo "callsigns: words file not readable ($words_file), skipping naming" >&2
+    exit 0
+  fi
 fi
 
 command -v jq >/dev/null 2>&1 || {
@@ -50,7 +53,53 @@ random_index() {
   echo $((n % $1 + 1))
 }
 
+# Leading zeros (never generated, read as octal) and numbers past 64-bit
+# arithmetic are not counted.
+pick_serial() {
+  ws="$("$herdr_bin" pane get "$2" 2>/dev/null | jq -r '.result.pane.workspace_id // empty')" || return 1
+  [ -n "$ws" ] || return 1
+  letters="$("$herdr_bin" api snapshot 2>/dev/null | jq -r --arg ws "$ws" '
+    [.result.snapshot.panes[]?] as $panes
+    | def letters(f): [$panes[] | select(f) | .label // ""
+        | select(test("^[a-z][1-9][0-9]*$")) | .[0:1]] | unique | join("");
+      "\(letters(.workspace_id == $ws)),\(letters(.workspace_id != $ws))"
+  ' 2>/dev/null)" || return 1
+  [ -n "$letters" ] || return 1
+  own="${letters%%,*}"
+  others="${letters#*,}"
+  letter="${own%"${own#?}"}"
+  if [ -z "$letter" ]; then
+    for l in a b c d e f g h i j k l m n o p q r s t u v w x y z; do
+      case "$others" in *"$l"*) continue ;; esac
+      letter="$l"
+      break
+    done
+  fi
+  [ -n "$letter" ] || {
+    echo "callsigns: no free workspace letter, leaving pane $2 unnamed" >&2
+    return 1
+  }
+
+  max=0
+  set -f
+  for token in $1; do
+    case "$token" in "$letter"*) ;; *) continue ;; esac
+    n="${token#"$letter"}"
+    case "$n" in '' | 0* | *[!0-9]*) continue ;; esac
+    [ "${#n}" -le 18 ] || continue
+    if [ "$n" -gt "$max" ]; then
+      max="$n"
+    fi
+  done
+  set +f
+  printf '%s%s' "$letter" $((max + 1))
+}
+
 pick_name() {
+  if [ "$scheme" = "serial" ]; then
+    pick_serial "$1" "$2"
+    return
+  fi
   used=" $1 "
   count="$(grep -c '' "$words_file")" || return 1
   [ "$count" -gt 0 ] || return 1
@@ -189,7 +238,7 @@ name_pane() {
       fi
       ;;
     esac
-    candidate="$(pick_name "$(used_names)$tried")" || {
+    candidate="$(pick_name "$(used_names)$tried" "$target")" || {
       [ "$locked" -eq 1 ] && release_lock
       return 1
     }

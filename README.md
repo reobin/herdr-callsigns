@@ -27,7 +27,17 @@ A callsign duplicated across workspaces is never guessed. The agent lists the ca
 - Existing callsigns are never overwritten.
 - Callsigns are unique across the server.
 - Once the word list is exhausted, callsigns pair two words (`neon-mars`). That is 30 single names plus hundreds of pairs; beyond that a pane is left without one.
+- In serial mode, each workspace gets a letter and its panes are numbered: `a1`, `a2` in one workspace, `b1` in the next. A workspace keeps the letter its panes already carry, or takes the first letter no other workspace uses; past 26 workspaces a new one gets no callsigns. Each new number is the highest in use for that letter, across pane labels and agent names, plus one, so a number freed by a closed pane is not refilled unless it was the highest.
 - Callsigns and agent names are independent. A pane with the callsign `pika` can host an agent named `reviewer`.
+
+## Serial callsigns
+
+```sh
+export HERDR_CALLSIGNS_SCHEME=serial  # default: words
+# then (re)start the herdr server so the hook picks it up
+```
+
+Serial mode ignores the word list.
 
 ## Custom word list
 

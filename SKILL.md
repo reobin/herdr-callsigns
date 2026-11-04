@@ -1,11 +1,11 @@
 ---
 name: herdr-callsigns
-description: Use when someone mentions a pane by a word - "check pane dawn", "look at pane tyr", "panes teal and seal", "tell lima to rerun it", "hi thor, this is io" - to resolve the callsign to a pane ID for herdr commands, and whenever you name a pane to the user or another agent, such as where you started a worker. Also covers auto-assigning callsigns.
+description: Use when someone mentions a pane by a word or a letter-number - "check pane dawn", "look at pane tyr", "panes teal and seal", "tell lima to rerun it", "hi thor, this is io", "what is b2 doing" - to resolve the callsign to a pane ID for herdr commands, and whenever you name a pane to the user or another agent, such as where you started a worker. Also covers auto-assigning callsigns.
 ---
 
 # herdr-callsigns
 
-Herdr panes carry a short callsign (`neon`, `mars`, `lima`) shown on the pane border. Users refer to panes by that callsign; the `herdr` CLI only accepts pane IDs (`wFB:p1`). Resolve the callsign to an ID first. In the API and the CLI the callsign is the pane's `label` field. "pane <word>" means <word> is the callsign candidate.
+Herdr panes carry a short callsign (`neon`, `mars`, `lima`) shown on the pane border. Users refer to panes by that callsign; the `herdr` CLI only accepts pane IDs (`wFB:p1`). Resolve the callsign to an ID first. In the API and the CLI the callsign is the pane's `label` field. "pane <word>" means <word> is the callsign candidate. So is a bare letter-number such as `b2`, with or without "pane": serial mode assigns those.
 
 Never claim a pane does not exist until you have checked the label column. The `herdr` skill documents pane IDs and agent names only, so an agent following it alone will not expect `pluto` to resolve.
 
@@ -57,4 +57,4 @@ They are independent namespaces. A pane with the callsign `pika` can host an age
 
 ## Assignment
 
-The plugin gives each new pane a callsign, and every pane still without one at startup. Existing callsigns are never overwritten, and they are unique across the server. Once the word list is exhausted it pairs two words, so a callsign may be compound (`bison-wapiti`). Beyond the pairs it can find, a pane is left without one rather than stalling the hook. The server may set `HERDR_CALLSIGNS_WORDS_FILE` to use a custom word list instead of the bundled one. To set one by hand: `herdr pane rename <id> <callsign>`.
+The plugin gives each new pane a callsign, and every pane still without one at startup. Existing callsigns are never overwritten, and they are unique across the server. Once the word list is exhausted it pairs two words, so a callsign may be compound (`bison-wapiti`). Beyond the pairs it can find, a pane is left without one rather than stalling the hook. The server may set `HERDR_CALLSIGNS_WORDS_FILE` to use a custom word list instead of the bundled one, or `HERDR_CALLSIGNS_SCHEME=serial` to number panes instead: a letter per workspace and a number per pane (`a1`, `a2`, `b1`), counting up from the highest number in use. To set one by hand: `herdr pane rename <id> <callsign>`.
